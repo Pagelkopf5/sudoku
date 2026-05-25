@@ -622,6 +622,7 @@ textarea {
   .controls {
     width: min(620px, 100%);
     margin: 0 auto;
+    gap: 12px;
   }
 
   .numberPad {
@@ -638,44 +639,121 @@ textarea {
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
   .app {
-    padding: 12px;
+    padding: 10px;
   }
 
   .topbar {
-    margin-bottom: 14px;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .eyebrow {
+    margin-bottom: 2px;
+    font-size: 0.7rem;
+  }
+
+  h1 {
+    font-size: 1.25rem;
   }
 
   .stats span {
     flex: 1;
+    min-width: 0;
+    padding: 7px 6px;
     text-align: center;
+    font-size: 0.82rem;
+  }
+
+  .iconButton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .gameArea {
+    gap: 14px;
   }
 
   .cell {
     font-size: clamp(1rem, 7vw, 1.8rem);
   }
 
-  .numberPad {
-    gap: 5px;
+  .controls {
+    gap: 10px;
   }
 
   .quickSettings {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .quickSettings label {
+    gap: 4px;
+    font-size: 0.68rem;
+  }
+
+  .quickSettings select {
+    min-height: 38px;
+    padding: 7px 6px;
+    font-size: 0.78rem;
+  }
+
+  .numberPad {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
   }
 
   .numberPad button {
-    min-height: 40px;
+    min-height: 56px;
+    aspect-ratio: auto;
+  }
+
+  .numberPad strong {
+    font-size: 1.45rem;
+  }
+
+  .numberPad small {
+    font-size: 0.72rem;
   }
 
   .actions {
     grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
   }
 
   .actions button {
-    min-height: 44px;
-    padding: 0 6px;
+    min-height: 48px;
+    gap: 4px;
+    padding: 0 4px;
+    font-size: 0.78rem;
+    line-height: 1.1;
+  }
+
+  .actions button span,
+  .quietAction span {
+    width: 1em;
+    font-size: 1rem;
+  }
+
+  .quietAction {
+    min-height: 42px;
+    font-size: 0.86rem;
+  }
+
+  .message {
+    min-height: 40px;
     font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .quickSettings select {
+    font-size: 0.72rem;
+  }
+
+  .actions button {
+    font-size: 0.72rem;
   }
 }
 
