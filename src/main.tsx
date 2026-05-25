@@ -245,7 +245,6 @@ function App() {
 
     setChecked(true);
     if (wrongCells > 0) {
-      setGame((current) => ({ ...current, errorCount: current.errorCount + wrongCells }));
       setMessage(`Existem ${wrongCells} célula(s) incorreta(s).`);
       return;
     }
