@@ -26,6 +26,8 @@ type SavedGame = {
   errorMode: ErrorMode;
   theme: ThemeMode;
   notesMode: boolean;
+  completed: boolean;
+  victoryDismissed: boolean;
 };
 
 const STORAGE_KEY = "sudoku-web-game";
@@ -139,6 +141,8 @@ function createGame(puzzle: Puzzle): SavedGame {
     errorMode: settings.errorMode,
     theme: settings.theme,
     notesMode: false,
+    completed: false,
+    victoryDismissed: false,
   };
 }
 
@@ -148,7 +152,7 @@ function loadGame(): SavedGame {
     if (saved) {
       const parsed = JSON.parse(saved) as SavedGame;
       if (parsed.cells?.length === 81 && parsed.solution?.length === 81) {
-        return parsed;
+        return { ...parsed, completed: parsed.completed ?? false, victoryDismissed: parsed.victoryDismissed ?? false };
       }
     }
   } catch {
@@ -185,12 +189,12 @@ function App() {
   }, [game]);
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || game.completed) return;
     const timer = window.setInterval(() => {
       setGame((current) => ({ ...current, elapsedSeconds: current.elapsedSeconds + 1 }));
     }, 1000);
     return () => window.clearInterval(timer);
-  }, [paused]);
+  }, [game.completed, paused]);
 
   useEffect(() => {
     if (animatedCell === null) return;
@@ -207,7 +211,7 @@ function App() {
   }, [game.cells, game.solution]);
 
   function updateCell(value: number) {
-    if (game.selected === null || givenCells[game.selected]) return;
+    if (game.completed || game.selected === null || givenCells[game.selected]) return;
 
     const nextCells = [...game.cells];
     const previous = nextCells[game.selected];
@@ -236,7 +240,7 @@ function App() {
   }
 
   function toggleNote(value: number) {
-    if (game.selected === null || givenCells[game.selected]) return;
+    if (game.completed || game.selected === null || givenCells[game.selected]) return;
 
     setGame((current) => ({
       ...current,
@@ -282,6 +286,7 @@ function App() {
     }
 
     setMessage(`Vitória em ${formatTime(game.elapsedSeconds)} com ${game.errorCount} erro(s).`);
+    setGame((current) => ({ ...current, completed: true, notesMode: false, selected: null, victoryDismissed: false }));
   }
 
   function restartGame() {
@@ -303,6 +308,7 @@ function App() {
   }
 
   function revealHint() {
+    if (game.completed) return;
     const target = game.cells.findIndex((cell, index) => cell === 0 && !givenCells[index]);
     if (target === -1) return;
     const nextCells = [...game.cells];
@@ -361,7 +367,7 @@ function App() {
         return;
       }
 
-      if (paused) return;
+      if (paused || game.completed) return;
 
       if (/^[1-9]$/.test(event.key)) {
         event.preventDefault();
@@ -417,15 +423,15 @@ function App() {
 
       <section className="gameArea">
         <div className="boardWrap">
-          {paused && <button className="pauseOverlay" type="button" onClick={() => setPaused(false)}>Continuar</button>}
-          <div className="board" aria-label="Tabuleiro de Sudoku">
+          {paused && !game.completed && <button className="pauseOverlay" type="button" onClick={() => setPaused(false)}>Continuar</button>}
+          <div className={`board ${game.completed ? "completed" : ""}`} aria-label="Tabuleiro de Sudoku">
             {game.cells.map((cell, index) => (
               <button
                 className={cellClass(index)}
                 key={index}
                 type="button"
                 onClick={() => setGame((current) => ({ ...current, selected: index }))}
-                disabled={paused}
+                disabled={paused || game.completed}
                 aria-label={`Linha ${rowOf(index) + 1}, coluna ${colOf(index) + 1}`}
               >
                 {cell > 0 ? (
@@ -440,6 +446,36 @@ function App() {
               </button>
             ))}
           </div>
+          {game.completed && !game.victoryDismissed && (
+            <div className="victoryOverlay" role="dialog" aria-modal="false" aria-label="Vitória">
+              <div className="victoryPanel">
+                <p className="eyebrow">Concluído</p>
+                <h2>Vitória</h2>
+                <div className="victoryStats">
+                  <span>
+                    <strong>{formatTime(game.elapsedSeconds)}</strong>
+                    Tempo
+                  </span>
+                  <span>
+                    <strong>{game.errorCount}</strong>
+                    Erros
+                  </span>
+                  <span>
+                    <strong>{game.hintsUsed}</strong>
+                    Dicas
+                  </span>
+                </div>
+                <div className="victoryActions">
+                  <button className="primary" type="button" onClick={() => newGame()}>
+                    + Novo
+                  </button>
+                  <button type="button" onClick={() => setGame((current) => ({ ...current, victoryDismissed: true }))}>
+                    Ver tabuleiro
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <aside className="controls">

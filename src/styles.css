@@ -167,6 +167,13 @@ h2 {
   box-shadow: var(--shadow);
 }
 
+.board.completed {
+  border-color: var(--accent);
+  box-shadow:
+    var(--shadow),
+    0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
 .cell {
   position: relative;
   min-width: 0;
@@ -181,6 +188,11 @@ h2 {
     color 130ms ease,
     outline-color 130ms ease,
     transform 130ms ease;
+}
+
+.board.completed .cell:disabled {
+  cursor: default;
+  opacity: 1;
 }
 
 .cell:not(:disabled):hover {
@@ -274,6 +286,72 @@ h2 {
   color: var(--strong);
   font-size: 1.4rem;
   font-weight: 900;
+}
+
+.victoryOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: color-mix(in srgb, var(--bg) 76%, transparent);
+  backdrop-filter: blur(2px);
+  animation: fade-in 160ms ease-out;
+}
+
+.victoryPanel {
+  display: grid;
+  gap: 16px;
+  width: min(340px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  text-align: center;
+  animation: victory-in 200ms ease-out;
+}
+
+.victoryPanel .eyebrow {
+  margin: 0;
+}
+
+.victoryStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.victoryStats span {
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.victoryStats strong {
+  color: var(--strong);
+  font-size: 1rem;
+}
+
+.victoryActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.victoryActions button {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font-weight: 800;
 }
 
 .controls {
@@ -472,6 +550,17 @@ h2 {
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes victory-in {
+  from {
+    opacity: 0.7;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
