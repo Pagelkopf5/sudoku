@@ -322,7 +322,6 @@ function App() {
   function cellClass(index: number): string {
     const row = rowOf(index);
     const col = colOf(index);
-    const box = boxOf(index);
     const selected = game.selected;
     const value = game.cells[index];
     const wrongByMode = value > 0 && String(value) !== game.solution[index] && (game.errorMode === "instantaneo" || checked);
@@ -331,7 +330,7 @@ function App() {
       "cell",
       givenCells[index] ? "given" : "",
       selected === index ? "selected" : "",
-      selected !== null && (rowOf(selected) === row || colOf(selected) === col || boxOf(selected) === box) ? "related" : "",
+      selected !== null && (rowOf(selected) === row || colOf(selected) === col) ? "related" : "",
       selectedValue && value === selectedValue ? "same-number" : "",
       wrongByMode || getConflicts(game.cells, index) ? "wrong" : "",
     ]
@@ -399,8 +398,8 @@ function App() {
           <span>{game.errorCount} erros</span>
           <span>{game.hintsUsed} dicas</span>
         </div>
-        <button className="iconButton" type="button" aria-label="Abrir configurações" onClick={() => setConfigOpen(true)}>
-          ⚙
+        <button className="iconButton" type="button" aria-label="Abrir código do Sudoku" onClick={() => setConfigOpen(true)}>
+          #
         </button>
       </section>
 
@@ -432,6 +431,39 @@ function App() {
         </div>
 
         <aside className="controls">
+          <div className="quickSettings" aria-label="Ajustes da partida">
+            <label>
+              <span>Dificuldade</span>
+              <select value={difficulty} onChange={(event) => newGame(event.target.value as Difficulty)}>
+                <option value="facil">Fácil</option>
+                <option value="medio">Médio</option>
+                <option value="dificil">Difícil</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Erros</span>
+              <select
+                value={game.errorMode}
+                onChange={(event) => setGame((current) => ({ ...current, errorMode: event.target.value as ErrorMode }))}
+              >
+                <option value="instantaneo">Na hora</option>
+                <option value="verificar">Ao verificar</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Tema</span>
+              <select
+                value={game.theme}
+                onChange={(event) => setGame((current) => ({ ...current, theme: event.target.value as ThemeMode }))}
+              >
+                <option value="light">Claro</option>
+                <option value="dark">Escuro</option>
+              </select>
+            </label>
+          </div>
+
           <div className="numberPad" aria-label="Teclado numérico">
             {Array.from({ length: 9 }, (_, index) => index + 1).map((number) => (
               <button
@@ -448,65 +480,54 @@ function App() {
           </div>
 
           <div className="actions">
-            <button type="button" onClick={clearCell} disabled={paused}>Limpar</button>
+            <button type="button" onClick={clearCell} disabled={paused} aria-label="Limpar célula">
+              <span aria-hidden="true">⌫</span>
+              Limpar
+            </button>
             <button
               type="button"
               className={game.notesMode ? "active" : ""}
               onClick={() => setGame((current) => ({ ...current, notesMode: !current.notesMode }))}
               disabled={paused}
+              aria-label="Alternar rascunho"
             >
+              <span aria-hidden="true">✎</span>
               Rascunho
             </button>
-            <button type="button" onClick={() => setPaused((value) => !value)}>{paused ? "Continuar" : "Pausar"}</button>
-            <button type="button" onClick={revealHint} disabled={paused}>Dica</button>
-            <button type="button" onClick={verifyGame} disabled={paused}>Verificar</button>
-            <button type="button" className="primary" onClick={() => newGame()}>Novo jogo</button>
+            <button type="button" onClick={() => setPaused((value) => !value)} aria-label={paused ? "Continuar partida" : "Pausar partida"}>
+              <span aria-hidden="true">{paused ? "▶" : "Ⅱ"}</span>
+              {paused ? "Continuar" : "Pausar"}
+            </button>
+            <button type="button" onClick={revealHint} disabled={paused} aria-label="Revelar dica">
+              <span aria-hidden="true">?</span>
+              Dica
+            </button>
+            <button type="button" onClick={verifyGame} disabled={paused} aria-label="Verificar jogo">
+              <span aria-hidden="true">✓</span>
+              Verificar
+            </button>
+            <button type="button" className="primary" onClick={() => newGame()} aria-label="Novo jogo">
+              <span aria-hidden="true">+</span>
+              Novo
+            </button>
           </div>
 
-          <button className="quietAction" type="button" onClick={restartGame}>Reiniciar partida</button>
+          <button className="quietAction" type="button" onClick={restartGame}>
+            <span aria-hidden="true">↻</span>
+            Reiniciar partida
+          </button>
 
           <p className="message" aria-live="polite">{message || "Selecione uma célula e escolha um número."}</p>
         </aside>
       </section>
 
       {configOpen && (
-        <div className="drawer" role="dialog" aria-modal="true" aria-label="Configurações">
+        <div className="drawer" role="dialog" aria-modal="true" aria-label="Código do Sudoku">
           <div className="drawerPanel">
             <div className="drawerHeader">
-              <h2>Configurações</h2>
+              <h2>Código</h2>
               <button className="iconButton" type="button" aria-label="Fechar configurações" onClick={() => setConfigOpen(false)}>×</button>
             </div>
-
-            <label>
-              Dificuldade
-              <select value={difficulty} onChange={(event) => newGame(event.target.value as Difficulty)}>
-                <option value="facil">Fácil</option>
-                <option value="medio">Médio</option>
-                <option value="dificil">Difícil</option>
-              </select>
-            </label>
-
-            <label>
-              Erros
-              <select
-                value={game.errorMode}
-                onChange={(event) => setGame((current) => ({ ...current, errorMode: event.target.value as ErrorMode }))}
-              >
-                <option value="instantaneo">Mostrar na hora</option>
-                <option value="verificar">Só ao verificar</option>
-              </select>
-            </label>
-
-            <label>
-              Tema
-              <select
-                value={game.theme}
-                onChange={(event) => setGame((current) => ({ ...current, theme: event.target.value as ThemeMode }))}
-              >
-                <option value="light">Claro</option>
-                <option value="dark">Escuro</option>
-              </select>
-            </label>
 
             <label>
               Código deste Sudoku

@@ -258,6 +258,28 @@ h2 {
   gap: 16px;
 }
 
+.quickSettings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.quickSettings label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.quickSettings select {
+  min-height: 42px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
 .numberPad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -301,6 +323,24 @@ h2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
+}
+
+.actions button,
+.quietAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.actions button span,
+.quietAction span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.15em;
+  font-size: 1.08em;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .actions button.active {
@@ -440,6 +480,10 @@ textarea {
 
   .numberPad {
     gap: 5px;
+  }
+
+  .quickSettings {
+    grid-template-columns: 1fr;
   }
 
   .numberPad button {
