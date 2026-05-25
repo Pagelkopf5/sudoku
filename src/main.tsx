@@ -329,6 +329,7 @@ function App() {
     return [
       "cell",
       givenCells[index] ? "given" : "",
+      !givenCells[index] && value > 0 ? "user-value" : "",
       selected === index ? "selected" : "",
       selected !== null && (rowOf(selected) === row || colOf(selected) === col) ? "related" : "",
       selectedValue && value === selectedValue ? "same-number" : "",

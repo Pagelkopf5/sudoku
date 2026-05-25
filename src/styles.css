@@ -201,6 +201,11 @@ h2 {
   font-weight: 900;
 }
 
+.cell.user-value {
+  color: var(--accent);
+  font-weight: 750;
+}
+
 .cell.related {
   background: var(--accent-soft);
 }
