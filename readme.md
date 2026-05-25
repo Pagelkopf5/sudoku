@@ -1,0 +1,1 @@
+Um sudoku padrão com darkmode, simples e eficiente
