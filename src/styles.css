@@ -641,7 +641,8 @@ textarea {
 
 @media (max-width: 640px) {
   .app {
-    padding: 10px;
+    border-inline: 1px solid var(--line);
+    padding: 10px 11px;
   }
 
   .topbar {
