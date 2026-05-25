@@ -1,17 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { puzzles, type Difficulty, type Puzzle } from "./puzzles";
 import "./styles.css";
 
-type Difficulty = "facil" | "medio" | "dificil";
 type ErrorMode = "instantaneo" | "verificar";
 type ThemeMode = "light" | "dark";
-
-type Puzzle = {
-  id: string;
-  difficulty: Difficulty;
-  puzzle: string;
-  solution: string;
-};
 
 type SavedGame = {
   puzzleCode: string;
@@ -32,45 +25,6 @@ type SavedGame = {
 
 const STORAGE_KEY = "sudoku-web-game";
 const SETTINGS_KEY = "sudoku-web-settings";
-
-const puzzles: Puzzle[] = [
-  {
-    id: "facil-1",
-    difficulty: "facil",
-    puzzle: "530070000600195000098000060800060003400803001700020006060000280000419005000080079",
-    solution: "534678912672195348198342567859761423426853791713924856961537284287419635345286179",
-  },
-  {
-    id: "facil-2",
-    difficulty: "facil",
-    puzzle: "200080300060070084030500209000105408000000000402706000301007040720040060004010003",
-    solution: "245986371169273584837541269976125438513498627482736915391657842728349156654812793",
-  },
-  {
-    id: "medio-1",
-    difficulty: "medio",
-    puzzle: "000260701680070090190004500820100040004602900050003028009300074040050036703018000",
-    solution: "435269781682571493197834562826195347374682915951743628519326874248957136763418259",
-  },
-  {
-    id: "medio-2",
-    difficulty: "medio",
-    puzzle: "100007090030020008009600500005300900010080002600004000300000010040000007007000300",
-    solution: "162857493534129678789643521475312986913586742628794135356478219241935867897261354",
-  },
-  {
-    id: "dificil-1",
-    difficulty: "dificil",
-    puzzle: "000000907000420180000705026100904000050000040000507009920108000034059000507000000",
-    solution: "462831957795426183381795426173984265659312748248567319926178534834259671517643892",
-  },
-  {
-    id: "dificil-2",
-    difficulty: "dificil",
-    puzzle: "030000080009000500007509200700105000000090000000402001006208300001000600080000010",
-    solution: "534621789219784536867539214743185962625397148198462371456218397371946825982753416",
-  },
-];
 
 const emptyNotes = () => Array.from({ length: 81 }, () => []);
 
@@ -152,7 +106,18 @@ function loadGame(): SavedGame {
     if (saved) {
       const parsed = JSON.parse(saved) as SavedGame;
       if (parsed.cells?.length === 81 && parsed.solution?.length === 81) {
-        return { ...parsed, completed: parsed.completed ?? false, victoryDismissed: parsed.victoryDismissed ?? false };
+        const knownPuzzle = findPuzzleByCode(parsed.puzzleCode);
+        if (!knownPuzzle) {
+          localStorage.removeItem(STORAGE_KEY);
+          return createGame(puzzles[0]);
+        }
+        return {
+          ...parsed,
+          difficulty: knownPuzzle.difficulty,
+          solution: knownPuzzle.solution,
+          completed: parsed.completed ?? false,
+          victoryDismissed: parsed.victoryDismissed ?? false,
+        };
       }
     }
   } catch {
