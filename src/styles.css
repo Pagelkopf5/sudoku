@@ -53,10 +53,11 @@ button {
   border: 0;
   cursor: pointer;
   transition:
-    background-color 140ms ease,
-    border-color 140ms ease,
-    color 140ms ease,
-    transform 140ms ease;
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
 }
 
 button:disabled {
@@ -128,6 +129,10 @@ h2 {
   background: var(--panel);
   color: var(--muted);
   font-weight: 700;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
 }
 
 .iconButton {
@@ -171,11 +176,17 @@ h2 {
   color: var(--text);
   font-size: clamp(1.2rem, 5vw, 2.3rem);
   font-weight: 650;
+  transition:
+    background-color 130ms ease,
+    color 130ms ease,
+    outline-color 130ms ease,
+    transform 130ms ease;
 }
 
 .cell:not(:disabled):hover {
   z-index: 1;
   background: color-mix(in srgb, var(--accent-soft) 78%, var(--panel));
+  transform: scale(1.015);
 }
 
 .cell:nth-child(3n) {
@@ -218,11 +229,18 @@ h2 {
   background: var(--selected);
   outline: 3px solid var(--accent);
   outline-offset: -3px;
+  z-index: 2;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .cell.wrong {
   background: var(--wrong);
   color: #941f1f;
+  animation: subtle-shake 170ms ease-out;
+}
+
+.cell.just-entered {
+  animation: number-pop 170ms ease-out;
 }
 
 .notesGrid {
@@ -316,6 +334,13 @@ h2 {
   transform: translateY(-1px);
 }
 
+.numberPad button:not(:disabled):active,
+.actions button:not(:disabled):active,
+.quietAction:not(:disabled):active,
+.iconButton:not(:disabled):active {
+  transform: translateY(0) scale(0.98);
+}
+
 .numberPad strong {
   font-size: 1.6rem;
 }
@@ -370,6 +395,7 @@ h2 {
   margin: 0;
   color: var(--muted);
   line-height: 1.45;
+  animation: message-in 180ms ease-out;
 }
 
 .drawer {
@@ -380,6 +406,7 @@ h2 {
   justify-content: flex-end;
   background: rgba(15, 23, 42, 0.45);
   padding: 16px;
+  animation: fade-in 160ms ease-out;
 }
 
 .drawerPanel {
@@ -389,6 +416,63 @@ h2 {
   background: var(--panel);
   box-shadow: var(--shadow);
   padding: 20px;
+  animation: drawer-in 180ms ease-out;
+}
+
+@keyframes number-pop {
+  0% {
+    transform: scale(0.92);
+  }
+  70% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes subtle-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  35% {
+    transform: translateX(-2px);
+  }
+  70% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes message-in {
+  from {
+    opacity: 0.65;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    opacity: 0.7;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .drawerHeader {
@@ -503,5 +587,16 @@ textarea {
     min-height: 44px;
     padding: 0 6px;
     font-size: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
   }
 }

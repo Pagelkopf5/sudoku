@@ -175,6 +175,7 @@ function App() {
   const [checked, setChecked] = useState(false);
   const [importCode, setImportCode] = useState(game.puzzleCode);
   const [message, setMessage] = useState("");
+  const [animatedCell, setAnimatedCell] = useState<number | null>(null);
   const givenCells = useMemo(() => toCells(game.puzzleCode), [game.puzzleCode]);
 
   useEffect(() => {
@@ -190,6 +191,12 @@ function App() {
     }, 1000);
     return () => window.clearInterval(timer);
   }, [paused]);
+
+  useEffect(() => {
+    if (animatedCell === null) return;
+    const timer = window.setTimeout(() => setAnimatedCell(null), 180);
+    return () => window.clearTimeout(timer);
+  }, [animatedCell]);
 
   const selectedValue = game.selected !== null ? game.cells[game.selected] : 0;
   const completedCount = useMemo(() => {
@@ -211,6 +218,9 @@ function App() {
 
     setChecked(false);
     setMessage("");
+    if (value > 0) {
+      setAnimatedCell(game.selected);
+    }
     setGame((current) => ({
       ...current,
       cells: nextCells,
@@ -330,6 +340,7 @@ function App() {
       "cell",
       givenCells[index] ? "given" : "",
       !givenCells[index] && value > 0 ? "user-value" : "",
+      animatedCell === index ? "just-entered" : "",
       selected === index ? "selected" : "",
       selected !== null && (rowOf(selected) === row || colOf(selected) === col) ? "related" : "",
       selectedValue && value === selectedValue ? "same-number" : "",
