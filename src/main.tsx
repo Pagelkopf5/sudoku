@@ -94,6 +94,10 @@ function boxOf(index: number): number {
   return Math.floor(rowOf(index) / 3) * 3 + Math.floor(colOf(index) / 3);
 }
 
+function isPeer(first: number, second: number): boolean {
+  return rowOf(first) === rowOf(second) || colOf(first) === colOf(second) || boxOf(first) === boxOf(second);
+}
+
 function isValidPuzzleCode(value: string): boolean {
   return /^[0-9.]{81}$/.test(value.trim());
 }
@@ -210,7 +214,13 @@ function App() {
     setGame((current) => ({
       ...current,
       cells: nextCells,
-      notes: current.notes.map((notes, index) => (index === current.selected ? [] : notes)),
+      notes: current.notes.map((notes, index) => {
+        if (index === current.selected) return [];
+        if (value > 0 && current.selected !== null && isPeer(index, current.selected)) {
+          return notes.filter((note) => note !== value);
+        }
+        return notes;
+      }),
       errorCount: current.errorCount + (shouldCountError ? 1 : 0),
     }));
   }
@@ -237,6 +247,13 @@ function App() {
 
   function clearCell() {
     updateCell(0);
+  }
+
+  function moveSelection(deltaRow: number, deltaCol: number) {
+    const start = game.selected ?? 0;
+    const nextRow = Math.min(8, Math.max(0, rowOf(start) + deltaRow));
+    const nextCol = Math.min(8, Math.max(0, colOf(start) + deltaCol));
+    setGame((current) => ({ ...current, selected: nextRow * 9 + nextCol }));
   }
 
   function verifyGame() {
@@ -322,6 +339,54 @@ function App() {
       .join(" ");
   }
 
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("textarea, select, input")) return;
+
+      if (event.key === "Escape" && configOpen) {
+        event.preventDefault();
+        setConfigOpen(false);
+        return;
+      }
+
+      if (paused) return;
+
+      if (/^[1-9]$/.test(event.key)) {
+        event.preventDefault();
+        handleNumber(Number(event.key));
+        return;
+      }
+
+      if (event.key === "Backspace" || event.key === "Delete" || event.key === "0") {
+        event.preventDefault();
+        clearCell();
+        return;
+      }
+
+      if (event.key.toLowerCase() === "n") {
+        event.preventDefault();
+        setGame((current) => ({ ...current, notesMode: !current.notesMode }));
+        return;
+      }
+
+      const moves: Record<string, [number, number]> = {
+        ArrowUp: [-1, 0],
+        ArrowDown: [1, 0],
+        ArrowLeft: [0, -1],
+        ArrowRight: [0, 1],
+      };
+      const move = moves[event.key];
+      if (move) {
+        event.preventDefault();
+        moveSelection(move[0], move[1]);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
+
   return (
     <main className="app">
       <section className="topbar" aria-label="Informações da partida">
@@ -352,7 +417,15 @@ function App() {
                 disabled={paused}
                 aria-label={`Linha ${rowOf(index) + 1}, coluna ${colOf(index) + 1}`}
               >
-                {cell > 0 ? cell : <span className="notes">{game.notes[index].join(" ")}</span>}
+                {cell > 0 ? (
+                  cell
+                ) : (
+                  <span className="notesGrid" aria-hidden="true">
+                    {Array.from({ length: 9 }, (_, noteIndex) => noteIndex + 1).map((note) => (
+                      <span key={note}>{game.notes[index].includes(note) ? note : ""}</span>
+                    ))}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -376,21 +449,21 @@ function App() {
 
           <div className="actions">
             <button type="button" onClick={clearCell} disabled={paused}>Limpar</button>
-            <button type="button" onClick={verifyGame} disabled={paused}>Verificar</button>
-            <button type="button" onClick={revealHint} disabled={paused}>Dica</button>
+            <button
+              type="button"
+              className={game.notesMode ? "active" : ""}
+              onClick={() => setGame((current) => ({ ...current, notesMode: !current.notesMode }))}
+              disabled={paused}
+            >
+              Rascunho
+            </button>
             <button type="button" onClick={() => setPaused((value) => !value)}>{paused ? "Continuar" : "Pausar"}</button>
-            <button type="button" onClick={restartGame}>Reiniciar</button>
+            <button type="button" onClick={revealHint} disabled={paused}>Dica</button>
+            <button type="button" onClick={verifyGame} disabled={paused}>Verificar</button>
             <button type="button" className="primary" onClick={() => newGame()}>Novo jogo</button>
           </div>
 
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={game.notesMode}
-              onChange={(event) => setGame((current) => ({ ...current, notesMode: event.target.checked }))}
-            />
-            Modo rascunho
-          </label>
+          <button className="quietAction" type="button" onClick={restartGame}>Reiniciar partida</button>
 
           <p className="message" aria-live="polite">{message || "Selecione uma célula e escolha um número."}</p>
         </aside>

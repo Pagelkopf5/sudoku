@@ -52,11 +52,27 @@ textarea {
 button {
   border: 0;
   cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
 }
 
 button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
+}
+
+button:not(:disabled):hover {
+  border-color: var(--accent);
+}
+
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .app {
@@ -157,6 +173,11 @@ h2 {
   font-weight: 650;
 }
 
+.cell:not(:disabled):hover {
+  z-index: 1;
+  background: color-mix(in srgb, var(--accent-soft) 78%, var(--panel));
+}
+
 .cell:nth-child(3n) {
   border-right: 3px solid var(--strong);
 }
@@ -199,17 +220,24 @@ h2 {
   color: #941f1f;
 }
 
-.notes {
+.notesGrid {
   display: grid;
-  place-items: center;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   width: 100%;
-  min-height: 100%;
+  height: 100%;
   padding: 2px;
   color: var(--muted);
-  font-size: clamp(0.48rem, 1.8vw, 0.8rem);
+  font-size: clamp(0.42rem, 1.4vw, 0.72rem);
+  font-weight: 800;
   line-height: 1.1;
-  white-space: normal;
-  word-break: break-word;
+}
+
+.notesGrid span {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
 }
 
 .pauseOverlay {
@@ -238,6 +266,7 @@ h2 {
 
 .numberPad button,
 .actions button,
+.quietAction,
 .wide {
   min-height: 48px;
   border-radius: 8px;
@@ -254,6 +283,12 @@ h2 {
   aspect-ratio: 1.35;
 }
 
+.numberPad button:not(:disabled):hover,
+.actions button:not(:disabled):hover,
+.quietAction:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
 .numberPad strong {
   font-size: 1.6rem;
 }
@@ -268,24 +303,21 @@ h2 {
   gap: 8px;
 }
 
+.actions button.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--strong);
+}
+
 .primary {
   background: var(--accent) !important;
   color: #ffffff !important;
   border-color: var(--accent) !important;
 }
 
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.quietAction {
   color: var(--muted);
-  font-weight: 700;
-}
-
-.toggle input {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--accent);
+  background: transparent;
 }
 
 .message {
