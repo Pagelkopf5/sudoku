@@ -1,4 +1,4 @@
-export type Difficulty = "facil" | "medio" | "dificil";
+export type Difficulty = "facil" | "medio" | "dificil" | "mestre";
 
 export type Puzzle = {
   id: string;

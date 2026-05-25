@@ -685,6 +685,26 @@ textarea {
   }
 
   .quickSettings {
+    order: 3;
+  }
+
+  .numberPad {
+    order: 1;
+  }
+
+  .actions {
+    order: 2;
+  }
+
+  .quietAction {
+    order: 4;
+  }
+
+  .message {
+    order: 5;
+  }
+
+  .quickSettings {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
   }

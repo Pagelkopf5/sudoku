@@ -451,6 +451,7 @@ function App() {
                 <option value="facil">Fácil</option>
                 <option value="medio">Médio</option>
                 <option value="dificil">Difícil</option>
+                <option value="mestre">Mestre</option>
               </select>
             </label>
 
